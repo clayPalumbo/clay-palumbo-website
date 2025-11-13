@@ -1,0 +1,12 @@
+# Bedrock AgentCore (required)
+bedrock-agentcore>=0.1.0
+
+# Strands AI Agent Framework
+strands-agents>=0.1.0
+
+# LLM clients (Bedrock models via Strands)
+anthropic>=0.40.0
+
+# Utilities
+python-dotenv>=1.0.0
+pydantic>=2.9.0

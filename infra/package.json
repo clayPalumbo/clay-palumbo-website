@@ -1,0 +1,26 @@
+{
+  "name": "claypalumbo-infra",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy --all",
+    "deploy:frontend": "ts-node scripts/deploy-frontend.ts",
+    "deploy:agent": "ts-node scripts/deploy-agent.ts",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "destroy": "cdk destroy --all"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.120.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "aws-sdk": "^2.1500.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.0"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "claypalumbo-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc && npm run bundle",
+    "bundle": "npm run bundle:chat && npm run bundle:email",
+    "bundle:chat": "esbuild src/chat/index.ts --bundle --platform=node --target=node20 --outfile=dist/chat/index.js --external:@aws-sdk/*",
+    "bundle:email": "esbuild src/email/index.ts --bundle --platform=node --target=node20 --outfile=dist/email/index.js --external:@aws-sdk/*",
+    "watch": "tsc -w",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.600.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.0"
+  }
+}

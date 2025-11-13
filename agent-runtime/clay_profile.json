@@ -1,0 +1,107 @@
+{
+  "name": "Clay Palumbo",
+  "title": "Engineering Leader & Product Builder",
+  "tagline": "Building AI-powered products and high-performing teams",
+  "summary": "Engineering leader with deep expertise in building AI systems, developer tools, and scalable products. Known for combining technical depth with strategic thinking to deliver high-impact solutions.",
+
+  "experience": [
+    {
+      "role": "Engineering Leadership",
+      "description": "Led cross-functional engineering teams, established technical direction, and built cultures of ownership and excellence",
+      "highlights": [
+        "Built and scaled engineering teams from 5 to 50+",
+        "Established technical standards and best practices",
+        "Mentored engineers across all levels",
+        "Led architecture decisions for mission-critical systems"
+      ]
+    },
+    {
+      "role": "AI/ML Systems",
+      "description": "Deep experience building production AI systems, agent frameworks, and ML infrastructure",
+      "highlights": [
+        "Built agent frameworks and orchestration systems",
+        "Designed and deployed LLM-powered products",
+        "Created tooling for AI observability and evaluation",
+        "Integrated AI capabilities into existing products"
+      ]
+    },
+    {
+      "role": "Product Development",
+      "description": "End-to-end product development from concept to scale",
+      "highlights": [
+        "Launched multiple 0-to-1 products",
+        "Led full-stack development teams",
+        "Owned product roadmap and technical execution",
+        "Built for scale and reliability from day one"
+      ]
+    }
+  ],
+
+  "technologies": {
+    "languages": ["TypeScript", "Python", "Go", "JavaScript", "Java"],
+    "cloud": ["AWS (deep expertise)", "GCP", "Azure"],
+    "ai_ml": ["Anthropic Claude", "OpenAI", "LangChain", "Strands", "Agent frameworks"],
+    "backend": ["Node.js", "FastAPI", "Express", "GraphQL", "REST APIs"],
+    "frontend": ["React", "Next.js", "Vue", "Tailwind CSS"],
+    "infra": ["Docker", "Kubernetes", "Terraform", "CDK", "Serverless"],
+    "databases": ["PostgreSQL", "DynamoDB", "MongoDB", "Redis"]
+  },
+
+  "strengths": [
+    "Building 0-to-1 products with strong technical foundations",
+    "Leading and scaling high-performing engineering teams",
+    "Architecting complex distributed systems",
+    "Rapid prototyping and iteration",
+    "Technical strategy and roadmap planning",
+    "Cross-functional collaboration",
+    "Developer experience and tooling"
+  ],
+
+  "approach": {
+    "product": "Start with user problems, iterate quickly, ship quality",
+    "technical": "Simple, composable, well-tested solutions that scale",
+    "leadership": "Trust, ownership, and clear communication",
+    "team_building": "Hire for potential, develop deliberately, retain top talent"
+  },
+
+  "audience_perspectives": {
+    "recruiter": {
+      "focus": ["Leadership experience", "Team scaling", "Technical depth", "Impact and outcomes"],
+      "pitch": "Engineering leader who builds both great products and great teams. Track record of scaling organizations and delivering high-impact technical solutions."
+    },
+    "client": {
+      "focus": ["Delivery capability", "Business outcomes", "Reliability", "Risk management"],
+      "pitch": "Partner who delivers quality solutions on time. Deep technical expertise combined with business acumen to solve complex problems and drive results."
+    },
+    "peer": {
+      "focus": ["Technical depth", "Architecture", "Best practices", "Collaboration style"],
+      "pitch": "Pragmatic engineer who values clean code, simple solutions, and continuous improvement. Strong focus on developer experience and team productivity."
+    },
+    "executive": {
+      "focus": ["Strategic thinking", "Value creation", "Risk management", "Organizational impact"],
+      "pitch": "Technical leader who thinks strategically about product, technology, and people. Proven ability to align technical execution with business objectives."
+    }
+  },
+
+  "projects_highlight": [
+    {
+      "name": "AI Agent Frameworks",
+      "description": "Built production agent systems with tool orchestration, streaming, and observability"
+    },
+    {
+      "name": "Developer Platforms",
+      "description": "Created internal platforms that improved developer productivity by 40%+"
+    },
+    {
+      "name": "Scalable Infrastructure",
+      "description": "Architected systems handling millions of requests per day with 99.99% uptime"
+    }
+  ],
+
+  "contact": {
+    "email": "clay@claypalumbo.com",
+    "location": "Available for remote work",
+    "timezone": "US-based",
+    "availability": "Open to full-time roles, consulting, and advisory work"
+  }
+}

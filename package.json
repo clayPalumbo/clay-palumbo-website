@@ -1,0 +1,31 @@
+{
+  "name": "claypalumbo-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "infra",
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:agent",
+    "install:agent": "cd agent-runtime && pip install -r requirements.txt",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:agent": "cd agent-runtime && docker build -t claypalumbo-agent .",
+    "deploy:infra": "cd infra && npm run deploy",
+    "deploy:frontend": "cd infra && npm run deploy:frontend",
+    "deploy:agent": "cd infra && npm run deploy:agent",
+    "deploy:all": "npm run build:frontend && npm run build:backend && npm run build:agent && npm run deploy:infra && npm run deploy:frontend && npm run deploy:agent",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0"
+  }
+}
