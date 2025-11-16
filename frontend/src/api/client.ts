@@ -71,7 +71,8 @@ export async function sendChatMessageStreaming(
             } else if (event.type === 'content' && event.text) {
               onChunk(event.text);
             } else if (event.type === 'error') {
-              throw new Error(event.message || 'Streaming error');
+              // Display error message in chat instead of throwing
+              onChunk(event.message || 'An error occurred while processing your request.');
             }
             // 'done' events are ignored, we just finish when the stream ends
           } catch (e) {

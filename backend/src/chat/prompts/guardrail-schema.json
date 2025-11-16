@@ -1,0 +1,42 @@
+{
+  "tools": [
+    {
+      "toolSpec": {
+        "name": "guardrail_check",
+        "description": "Evaluate if a message is allowed based on content policy",
+        "inputSchema": {
+          "json": {
+            "type": "object",
+            "properties": {
+              "allowed": {
+                "type": "boolean",
+                "description": "Whether the message is allowed (true) or not (false)"
+              },
+              "category": {
+                "type": "string",
+                "description": "Category of the evaluation",
+                "enum": [
+                  "ALLOWED",
+                  "OFF_TOPIC",
+                  "PERSONAL_SENSITIVE",
+                  "MALICIOUS_OR_HARMFUL",
+                  "PROMPT_INJECTION"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "description": "Brief explanation for the decision. Short tweet-length."
+              }
+            },
+            "required": ["allowed", "category", "reason"]
+          }
+        }
+      }
+    }
+  ],
+  "toolChoice": {
+    "tool": {
+      "name": "guardrail_check"
+    }
+  }
+}

@@ -7,7 +7,8 @@
     "bundle": "npm run bundle:chat && npm run bundle:email",
     "bundle:chat": "esbuild src/chat/index.ts --bundle --platform=node --target=node20 --outfile=dist/chat/index.js --external:@aws-sdk/*",
     "bundle:email": "esbuild src/email/index.ts --bundle --platform=node --target=node20 --outfile=dist/email/index.js --external:@aws-sdk/*",
-    "copy-prompts": "mkdir -p dist/chat/prompts && cp src/chat/prompts/*.txt dist/chat/prompts/",
+    "copy-prompts": "mkdir -p dist/chat/prompts && cp src/chat/prompts/*.txt dist/chat/prompts/ && cp src/chat/prompts/*.json dist/chat/prompts/",
+    "test-prompt": "tsx src/chat/test-prompt.ts",
     "watch": "tsc -w",
     "test": "jest",
     "lint": "eslint src/**/*.ts"
@@ -22,6 +23,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "esbuild": "^0.20.0",
     "eslint": "^8.57.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.3.0"
   }
 }

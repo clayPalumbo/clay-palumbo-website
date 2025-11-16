@@ -81,11 +81,12 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
           <div className="prose prose-invert prose-sm max-w-none [&>p]:text-[15px] [&>p]:leading-relaxed [&>p]:font-normal [&>p]:text-gray-200 [&>ul]:text-[15px] [&>ol]:text-[15px] [&>li]:text-gray-200 [&>h1]:text-xl [&>h1]:font-semibold [&>h1]:mb-2 [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:mb-2 [&>h3]:text-base [&>h3]:font-semibold [&>h3]:mb-1 [&>a]:text-blue-400 [&>a]:underline hover:[&>a]:text-blue-300 [&>code]:bg-white/[0.1] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-sm [&>code]:text-gray-200">
             <ReactMarkdown
               components={{
-                code({ node, inline, className, children, ...props }) {
+                code({ node, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || '');
+                  const inline = (props as any).inline;
                   return !inline && match ? (
                     <SyntaxHighlighter
-                      style={vscDarkPlus}
+                      style={vscDarkPlus as any}
                       language={match[1]}
                       PreTag="div"
                       customStyle={{
@@ -93,7 +94,6 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
                         borderRadius: '8px',
                         fontSize: '14px',
                       }}
-                      {...props}
                     >
                       {String(children).replace(/\n$/, '')}
                     </SyntaxHighlighter>

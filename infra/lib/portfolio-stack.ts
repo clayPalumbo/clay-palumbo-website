@@ -101,7 +101,7 @@ export class PortfolioStack extends cdk.Stack {
         allowedOrigins: allowedOrigins,
         allowedMethods: [lambda.HttpMethod.ALL], // Allow all methods including OPTIONS
         allowedHeaders: ['*'], // Allow all headers for SSE streaming
-        exposeHeaders: ['*'], // Expose all headers for SSE streaming
+        exposedHeaders: ['*'], // Expose all headers for SSE streaming
         maxAge: cdk.Duration.hours(1),
       },
       invokeMode: lambda.InvokeMode.RESPONSE_STREAM, // Enable streaming!

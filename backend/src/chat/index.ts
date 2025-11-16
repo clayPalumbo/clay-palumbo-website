@@ -10,18 +10,23 @@
 import type { Context } from 'aws-lambda';
 import {
   BedrockRuntimeClient,
+  InvokeModelCommand,
   InvokeModelWithResponseStreamCommand,
 } from '@aws-sdk/client-bedrock-runtime';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { getGuardrailErrorMessage } from './prompts/guardrail-message';
 
 // Configuration
-// const MODEL_ID = 'anthropic.claude-haiku-4-5-20251001-v1:0'; 
+// const MODEL_ID = 'anthropic.claude-haiku-4-5-20251001-v1:0';
 const MODEL_ID = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'; // Claude Sonnet 4.5 inference profile
+const GUARDRAIL_MODEL_ID = 'us.amazon.nova-pro-v1:0'; // Nova Pro for guardrails
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
 
-// Load system prompt from file
+// Load system prompts from files
 const SYSTEM_PROMPT = readFileSync(join(__dirname, 'prompts', 'clay-agent-instructions.txt'), 'utf-8');
+const GUARDRAIL_PROMPT = readFileSync(join(__dirname, 'prompts', 'input-guardrails.txt'), 'utf-8');
+const GUARDRAIL_SCHEMA = JSON.parse(readFileSync(join(__dirname, 'prompts', 'guardrail-schema.json'), 'utf-8'));
 
 // Initialize Bedrock Runtime client
 const client = new BedrockRuntimeClient({ region: AWS_REGION });
@@ -34,6 +39,58 @@ interface ChatMessage {
 interface ChatRequest {
   messages: ChatMessage[];
   sessionId?: string;
+}
+
+interface GuardrailResponse {
+  allowed: boolean;
+  reason?: string;
+  category?: string;
+}
+
+/**
+ * Check if the user message passes content guardrails using Nova Pro with structured outputs
+ */
+async function checkGuardrail(userMessage: string): Promise<GuardrailResponse> {
+  const requestBody = {
+    system: [{ text: GUARDRAIL_PROMPT }],
+    messages: [
+      {
+        role: 'user',
+        content: [{ text: `Evaluate this message: "${userMessage.replace(/"/g, '\\"')}"` }],
+      },
+    ],
+    inferenceConfig: {
+      maxTokens: 200, // Increased for tool use with chain-of-thought reasoning
+      temperature: 0,
+      topK: 1, // Required for greedy decoding with Nova models
+    },
+    toolConfig: GUARDRAIL_SCHEMA,
+  };
+
+  const command = new InvokeModelCommand({
+    modelId: GUARDRAIL_MODEL_ID,
+    contentType: 'application/json',
+    accept: 'application/json',
+    body: JSON.stringify(requestBody),
+  });
+
+  const response = await client.send(command);
+  const responseBody = JSON.parse(new TextDecoder().decode(response.body));
+
+  // Nova Pro with tool use returns {output: {message: {content: [{toolUse: {...}}]}}}
+  const toolUse = responseBody.output?.message?.content?.find((c: any) => c.toolUse);
+  console.log('Guardrail tool use response:', JSON.stringify(toolUse));
+  if (toolUse?.toolUse?.input) {
+    return {
+      allowed: !!toolUse.toolUse.input.allowed,
+      reason: toolUse.toolUse.input.reason,
+      category: toolUse.toolUse.input.category,
+    };
+  }
+
+  // Fallback - if no tool use found, default to allowing (fail open)
+  console.error('No tool use found in guardrail response:', JSON.stringify(responseBody));
+  return { allowed: true, reason: 'Guardrail error - defaulting to allow' };
 }
 
 /**
@@ -76,18 +133,41 @@ export const handler = awslambda.streamifyResponse(
         return;
       }
 
+      // Check guardrails before processing
+      const guardrailCheck = await checkGuardrail(latestMessage.content);
+      if (!(guardrailCheck.category === 'ALLOWED')) {
+        responseStream.write(
+          `data: ${JSON.stringify({
+            type: 'error',
+            error: 'Content not allowed',
+            message: getGuardrailErrorMessage(guardrailCheck.reason, guardrailCheck.category)
+          })}\n\n`
+        );
+        responseStream.end();
+        return;
+      }
+
       const effectiveSessionId = sessionId || generateSessionId();
 
-      // Convert messages to Claude format
-      const claudeMessages = messages.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'assistant',
-        content: [
-          {
-            type: 'text',
-            text: msg.content,
-          },
-        ],
-      }));
+      // Convert messages to Claude format, filtering out empty messages
+      const claudeMessages = messages
+        .filter(msg => msg.content && msg.content.trim().length > 0)
+        .map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: [
+            {
+              type: 'text',
+              text: msg.content,
+            },
+          ],
+        }));
+
+      // Ensure we have messages after filtering
+      if (claudeMessages.length === 0) {
+        responseStream.write('data: {"error": "No valid messages after filtering"}\\n\\n');
+        responseStream.end();
+        return;
+      }
 
       // Prepare request body for Claude
       const requestBody = {

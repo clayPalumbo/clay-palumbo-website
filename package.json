@@ -15,6 +15,7 @@
     "build:agent": "cd agent-runtime && docker build -t claypalumbo-agent .",
     "deploy:infra": "cd infra && npm run deploy",
     "deploy:frontend": "cd infra && npm run deploy:frontend",
+    "deploy:backend": "npm run build && cd ../infra && cdk deploy --require-approval never",
     "deploy:agent": "cd infra && npm run deploy:agent",
     "deploy:all": "npm run build:frontend && npm run build:backend && npm run build:agent && npm run deploy:infra && npm run deploy:frontend && npm run deploy:agent",
     "dev:frontend": "cd frontend && npm run dev",
