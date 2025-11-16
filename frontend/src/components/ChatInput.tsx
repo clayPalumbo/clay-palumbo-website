@@ -41,7 +41,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
       <button
         onClick={handleSend}
         disabled={disabled || !input.trim()}
-        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/[0.1] hover:bg-white/[0.15] active:scale-95 rounded-full font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/[0.1] disabled:active:scale-100"
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[rgb(96,165,250)]/[0.5] hover:bg-[rgb(96,165,250)]/[0.75] active:scale-95 rounded-full font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[rgb(96,165,250)]/[0.15] disabled:active:scale-100"
       >
         <svg
           className="w-5 h-5"

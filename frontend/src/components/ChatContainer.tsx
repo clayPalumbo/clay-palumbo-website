@@ -43,7 +43,7 @@ const STARTER_PROMPTS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
       </svg>
     ),
-    text: "About This Site",
+    text: "How I Built This Site",
     prompt: "Tell me about how this website was built and the technology behind it"
   },
 ];
@@ -153,7 +153,7 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
       {isEmpty ? (
         // Empty state: centered input with starters below
         <div className="flex-1 flex flex-col items-center justify-center px-4 animate-fade-in">
-          <div className="w-full max-w-3xl space-y-4">
+          <div className="w-full max-w-3xl space-y-4 glass-panel p-5 rounded-2xl">
             <div className="flex justify-center mb-6">
               <img
                 src={clayHeadshot}
@@ -173,8 +173,9 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
                   key={index}
                   onClick={() => handleSendMessage(starter.prompt)}
                   disabled={isLoading}
-                  className={`group px-4 py-3 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ${index !== STARTER_PROMPTS.length - 1 ? 'border-b border-white/[0.08]' : ''
+                  className={`group px-4 py-3 mb-1 rounded-2xl hover:bg-white/[0.06] transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 animate-slide-up ${index !== STARTER_PROMPTS.length - 1 ? 'border-b border-white/[0.08]' : ''
                     }`}
+                  style={{ animationDelay: `${index * 0.2}s` }}
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="text-gray-400 group-hover:text-gray-300 transition-colors">{starter.icon}</span>
@@ -190,7 +191,7 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
       ) : (
         // Chat mode: messages + input at bottom
         <>
-          <div className="flex-1 overflow-y-auto px-4 py-8 space-y-6">
+          <div className="flex-1 overflow-y-auto px-4 py-8 space-y-6 glass-panel rounded-2xl m-4">
             <div className="max-w-3xl mx-auto">
               <MessageList messages={messages} isLoading={isLoading} />
               <div ref={messagesEndRef} />

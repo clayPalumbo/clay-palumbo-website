@@ -1,5 +1,4 @@
 import MessageBubble from './MessageBubble';
-import TypingIndicator from './TypingIndicator';
 import type { Message } from '../types';
 
 interface MessageListProps {
@@ -18,10 +17,23 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
 
   return (
     <>
-      {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} />
-      ))}
-      {isLoading && <TypingIndicator />}
+      {messages.map((message, index) => {
+        // Show loading state on the last assistant message when isLoading is true
+        const isLastAssistantMessage =
+          isLoading &&
+          index === messages.length - 1 &&
+          message.role === 'assistant';
+
+        return (
+          <div className="mb-8">
+            <MessageBubble
+              key={message.id}
+              message={message}
+              isLoading={isLastAssistantMessage}
+            />
+          </div>
+        );
+      })}
     </>
   );
 }

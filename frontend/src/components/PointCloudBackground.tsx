@@ -123,7 +123,7 @@ function ParticleField() {
           vertexColors={true}
           sizeAttenuation={true}
           transparent={true}
-          opacity={0.3}
+          opacity={0.2}
           blending={THREE.AdditiveBlending}
         />
       </points>
@@ -155,7 +155,7 @@ function ParticleField() {
           vertexColors={true}
           sizeAttenuation={true}
           transparent={true}
-          opacity={0.8}
+          opacity={0.1}
           blending={THREE.AdditiveBlending}
         />
       </points>
