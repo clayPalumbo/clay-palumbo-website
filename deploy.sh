@@ -71,7 +71,7 @@ echo ""
 
 # Step 4: Build and push agent
 echo "Step 4: Building and pushing agent runtime..."
-echo -e "${YELLOW}Note: Make sure ANTHROPIC_API_KEY is set in AWS Secrets Manager or Lambda environment${NC}"
+echo -e "${YELLOW}Note: Ensure Bedrock model access is enabled in your AWS account${NC}"
 
 # Get ECR repository URI
 REPO_URI=$(aws cloudformation describe-stacks \
@@ -153,7 +153,8 @@ echo ""
 echo "API Endpoint:"
 echo -e "${GREEN}$API_URL${NC}"
 echo ""
-echo -e "${YELLOW}Important: Make sure to set ANTHROPIC_API_KEY in your Lambda environment variables!${NC}"
+echo -e "${YELLOW}Important: Ensure Bedrock model access is enabled for Claude 3.5 Sonnet!${NC}"
+echo "  Go to: AWS Console > Bedrock > Model access > Request model access"
 echo ""
 echo "To update in the future:"
 echo "  - Frontend: npm run build:frontend && npm run deploy:frontend"

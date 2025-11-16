@@ -1,11 +1,12 @@
 # Bedrock AgentCore (required)
 bedrock-agentcore>=0.1.0
 
-# Strands AI Agent Framework
+# Strands AI Agent Framework (includes Bedrock support)
 strands-agents>=0.1.0
 
-# LLM clients (Bedrock models via Strands)
-anthropic>=0.40.0
+# AWS SDK for Bedrock
+boto3>=1.34.0
+botocore>=1.34.0
 
 # Utilities
 python-dotenv>=1.0.0

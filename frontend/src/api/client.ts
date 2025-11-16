@@ -1,6 +1,6 @@
 import type { ChatRequest, ChatResponse, EmailRequest, EmailResponse } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://z8bglb0j57.execute-api.us-east-1.amazonaws.com';
 
 class APIError extends Error {
   constructor(public status: number, message: string) {

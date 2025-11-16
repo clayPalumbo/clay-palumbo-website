@@ -18,24 +18,26 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
     >
       <div
         className={clsx(
-          'max-w-[80%] rounded-lg px-4 py-3',
+          'max-w-[75%] rounded-[18px] px-5 py-3.5',
           isUser
-            ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white'
-            : 'bg-gray-700/50 text-gray-100 border border-gray-600'
+            ? 'bg-[#007AFF] text-white shadow-lg shadow-blue-500/20'
+            : 'bg-white/[0.06] text-white border border-white/[0.08]'
         )}
       >
         {isUser ? (
-          <p className="whitespace-pre-wrap">{message.content}</p>
+          <p className="whitespace-pre-wrap text-[15px] leading-relaxed font-normal">
+            {message.content}
+          </p>
         ) : (
-          <div className="prose prose-invert prose-sm max-w-none">
+          <div className="prose prose-invert prose-sm max-w-none [&>p]:text-[15px] [&>p]:leading-relaxed [&>p]:font-normal [&>p]:text-gray-200 [&>ul]:text-[15px] [&>ol]:text-[15px] [&>li]:text-gray-200">
             <ReactMarkdown>{message.content}</ReactMarkdown>
           </div>
         )}
 
         <div
           className={clsx(
-            'text-xs mt-2',
-            isUser ? 'text-blue-100' : 'text-gray-400'
+            'text-[11px] mt-2 font-light',
+            isUser ? 'text-white/60' : 'text-gray-500'
           )}
         >
           {new Date(message.timestamp).toLocaleTimeString([], {

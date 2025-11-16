@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 8080
 
 # Run the agent server
-CMD ["python", "server.py"]
+CMD ["python", "agent.py"]

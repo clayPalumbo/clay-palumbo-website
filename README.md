@@ -53,6 +53,7 @@ This is a "new age resume" - a personal portfolio where visitors interact with a
 - **Docker** (for agent runtime)
 - **AWS CLI** configured with appropriate credentials
 - **AWS CDK** CLI (`npm install -g aws-cdk`)
+- **AWS Bedrock** access to Claude models ([setup guide](./BEDROCK_SETUP.md))
 
 ## Quick Start
 
@@ -76,7 +77,8 @@ Create environment files:
 ```bash
 # Agent runtime
 cp agent-runtime/.env.example agent-runtime/.env
-# Edit and add your ANTHROPIC_API_KEY
+# Edit and set AWS_REGION (defaults to us-east-1)
+# AWS credentials will be picked up from ~/.aws/credentials or IAM role
 ```
 
 ### 3. Local Development
@@ -92,8 +94,8 @@ npm run dev:frontend
 
 ```bash
 cd agent-runtime
-export ANTHROPIC_API_KEY=your_key_here
 export AWS_REGION=us-east-1
+# AWS credentials via ~/.aws/credentials or IAM role
 python agent.py
 # Agent runs at http://localhost:8080
 ```
@@ -143,6 +145,7 @@ This creates:
 ```bash
 npm run build:agent
 npm run deploy:agent
+# The agent will use Bedrock via IAM role (no API key needed)
 ```
 
 #### 3. Deploy Frontend
@@ -314,7 +317,8 @@ Total: ~$15-50/month for typical usage
 
 - Check Lambda logs in CloudWatch
 - Verify AgentCore agent is deployed
-- Check ANTHROPIC_API_KEY is set
+- Ensure Bedrock model access is enabled (us.anthropic.claude-3-5-sonnet-20241022-v1:0)
+- Verify Lambda IAM role has bedrock:InvokeModel permissions
 
 ### Build failures
 

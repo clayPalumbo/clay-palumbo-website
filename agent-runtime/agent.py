@@ -13,7 +13,7 @@ app = BedrockAgentCoreApp()
 
 # Configuration
 REGION = os.getenv("AWS_REGION", "us-east-1")
-MODEL_ID = "us.anthropic.claude-3-5-sonnet-20241022-v1:0"
+MODEL_ID = "anthropic.claude-3-5-sonnet-20241022-v2:0"  # Bedrock model ID
 
 # Load Clay's profile
 def load_profile(path: str = "clay_profile.json") -> Dict[str, Any]:

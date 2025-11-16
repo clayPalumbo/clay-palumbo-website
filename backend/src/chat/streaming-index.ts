@@ -4,17 +4,22 @@
  * This Lambda function uses Lambda Response Streaming with Function URLs
  * 1. Receives chat messages from the frontend
  * 2. Calls AWS Bedrock (Claude model) with streaming
- * 3. Streams the response back in real-time via Server-Sent Events (SSE)
+ * 3. Streams the response back in real-time
  */
 
-import type { Context } from 'aws-lambda';
+import type {
+  APIGatewayProxyEventV2,
+  Context,
+  APIGatewayProxyStructuredResultV2,
+} from 'aws-lambda';
+import { Readable } from 'stream';
 import {
   BedrockRuntimeClient,
   InvokeModelWithResponseStreamCommand,
 } from '@aws-sdk/client-bedrock-runtime';
 
 // Configuration
-const MODEL_ID = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'; // Claude Sonnet 4.5 inference profile
+const MODEL_ID = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0';
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
 
 // Initialize Bedrock Runtime client
@@ -32,11 +37,11 @@ interface ChatRequest {
 
 /**
  * Lambda Response Streaming Handler
- * This uses the awslambda.streamifyResponse wrapper for true streaming
+ * This uses the awslambda.streamifyResponse wrapper
  */
 export const handler = awslambda.streamifyResponse(
   async (
-    event: any,
+    event: APIGatewayProxyEventV2,
     responseStream: NodeJS.WritableStream,
     context: Context
   ): Promise<void> => {
@@ -55,8 +60,13 @@ export const handler = awslambda.streamifyResponse(
 
     try {
       // Parse request body
-      const body = event.body || '{}';
-      const request: ChatRequest = JSON.parse(body);
+      if (!event.body) {
+        responseStream.write('data: {"error": "Request body is required"}\n\n');
+        responseStream.end();
+        return;
+      }
+
+      const request: ChatRequest = JSON.parse(event.body);
       const { messages, sessionId } = request;
 
       if (!messages || messages.length === 0) {
@@ -118,9 +128,12 @@ Keep responses concise but thorough (2-4 paragraphs unless more detail is reques
           if (event.chunk?.bytes) {
             const chunk = JSON.parse(new TextDecoder().decode(event.chunk.bytes));
 
-            // Handle different event types from Claude
-            if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
-              responseStream.write(`data: ${JSON.stringify({ type: 'content', text: chunk.delta.text })}\n\n`);
+            // Handle different event types
+            if (chunk.type === 'content_block_delta') {
+              const text = chunk.delta?.text || '';
+              if (text) {
+                responseStream.write(`data: ${JSON.stringify({ type: 'content', text })}\n\n`);
+              }
             } else if (chunk.type === 'message_stop') {
               responseStream.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
             }

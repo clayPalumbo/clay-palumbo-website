@@ -15,7 +15,7 @@ import { Construct } from 'constructs';
 import * as path from 'path';
 
 export interface PortfolioStackProps extends cdk.StackProps {
-  domainName: string;
+  domainName?: string;
 }
 
 export class PortfolioStack extends cdk.Stack {
@@ -52,9 +52,23 @@ export class PortfolioStack extends cdk.Stack {
       environment: {
         AGENT_RUNTIME_URL: 'http://agent-runtime:8080', // Update this based on AgentCore setup
         NODE_ENV: 'production',
+        // AWS_REGION is automatically set by Lambda runtime
       },
       logRetention: logs.RetentionDays.ONE_WEEK,
     });
+
+    // Grant Bedrock permissions to Chat Lambda
+    chatLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'bedrock:InvokeAgent',
+          'bedrock:InvokeModel',
+          'bedrock:InvokeModelWithResponseStream',
+        ],
+        resources: ['*'], // In production, scope this to specific agent/model ARNs
+      })
+    );
 
     // Email Stub Lambda
     const emailLambda = new lambda.Function(this, 'EmailFunction', {
@@ -73,13 +87,34 @@ export class PortfolioStack extends cdk.Stack {
     agentRepository.grantPull(chatLambda);
 
     // =====================================================
+    // CORS Configuration
+    // =====================================================
+    const allowedOrigins = ['http://localhost:5173'];
+    if (domainName) {
+      allowedOrigins.push(`https://${domainName}`);
+    }
+
+    // Add Lambda Function URL for streaming support
+    const chatFunctionUrl = chatLambda.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins: allowedOrigins,
+        allowedMethods: [lambda.HttpMethod.POST],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        maxAge: cdk.Duration.hours(1),
+      },
+      invokeMode: lambda.InvokeMode.RESPONSE_STREAM, // Enable streaming!
+    });
+
+    // =====================================================
     // API Gateway HTTP API
     // =====================================================
+
     const httpApi = new apigateway.HttpApi(this, 'PortfolioApi', {
       apiName: 'claypalumbo-portfolio-api',
       description: 'API for Clay Palumbo Portfolio Agent',
       corsPreflight: {
-        allowOrigins: [`https://${domainName}`, 'http://localhost:5173'],
+        allowOrigins: allowedOrigins,
         allowMethods: [apigateway.CorsHttpMethod.POST, apigateway.CorsHttpMethod.OPTIONS],
         allowHeaders: ['Content-Type', 'Authorization'],
         maxAge: cdk.Duration.hours(1),
@@ -112,16 +147,21 @@ export class PortfolioStack extends cdk.Stack {
     });
 
     // =====================================================
-    // ACM Certificate
+    // ACM Certificate (only if domain configured)
     // =====================================================
-    const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-      domainName: domainName,
-    });
+    let hostedZone: route53.IHostedZone | undefined;
+    let certificate: acm.ICertificate | undefined;
 
-    const certificate = new acm.Certificate(this, 'Certificate', {
-      domainName: domainName,
-      validation: acm.CertificateValidation.fromDns(hostedZone),
-    });
+    if (domainName) {
+      hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+        domainName: domainName,
+      });
+
+      certificate = new acm.Certificate(this, 'Certificate', {
+        domainName: domainName,
+        validation: acm.CertificateValidation.fromDns(hostedZone),
+      });
+    }
 
     // =====================================================
     // CloudFront Distribution
@@ -130,13 +170,13 @@ export class PortfolioStack extends cdk.Stack {
       this,
       'OriginAccessIdentity',
       {
-        comment: `OAI for ${domainName}`,
+        comment: `OAI for ${domainName || 'claypalumbo-portfolio'}`,
       }
     );
 
     frontendBucket.grantRead(originAccessIdentity);
 
-    const distribution = new cloudfront.Distribution(this, 'Distribution', {
+    const distributionConfig: cloudfront.DistributionProps = {
       defaultBehavior: {
         origin: new origins.S3Origin(frontendBucket, {
           originAccessIdentity,
@@ -146,8 +186,6 @@ export class PortfolioStack extends cdk.Stack {
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
         compress: true,
       },
-      domainNames: [domainName],
-      certificate: certificate,
       defaultRootObject: 'index.html',
       errorResponses: [
         {
@@ -166,22 +204,31 @@ export class PortfolioStack extends cdk.Stack {
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
-    });
+      // Add custom domain configuration if domain is specified
+      ...(domainName && certificate ? {
+        domainNames: [domainName],
+        certificate: certificate,
+      } : {}),
+    };
+
+    const distribution = new cloudfront.Distribution(this, 'Distribution', distributionConfig);
 
     // =====================================================
-    // Route 53 Records
+    // Route 53 Records (only if domain configured)
     // =====================================================
-    new route53.ARecord(this, 'AliasRecord', {
-      zone: hostedZone,
-      recordName: domainName,
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
-    });
+    if (domainName && hostedZone) {
+      new route53.ARecord(this, 'AliasRecord', {
+        zone: hostedZone,
+        recordName: domainName,
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      });
 
-    new route53.AaaaRecord(this, 'AliasRecordIPv6', {
-      zone: hostedZone,
-      recordName: domainName,
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
-    });
+      new route53.AaaaRecord(this, 'AliasRecordIPv6', {
+        zone: hostedZone,
+        recordName: domainName,
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      });
+    }
 
     // =====================================================
     // Outputs
@@ -190,6 +237,12 @@ export class PortfolioStack extends cdk.Stack {
       value: httpApi.apiEndpoint,
       description: 'API Gateway endpoint URL',
       exportName: 'ClayPalumboApiUrl',
+    });
+
+    new cdk.CfnOutput(this, 'StreamingApiUrl', {
+      value: chatFunctionUrl.url,
+      description: 'Lambda Function URL for streaming chat (SSE)',
+      exportName: 'ClayPalumboStreamingApiUrl',
     });
 
     new cdk.CfnOutput(this, 'DistributionId', {
@@ -211,7 +264,7 @@ export class PortfolioStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, 'WebsiteUrl', {
-      value: `https://${domainName}`,
+      value: domainName ? `https://${domainName}` : `https://${distribution.distributionDomainName}`,
       description: 'Website URL',
       exportName: 'ClayPalumboWebsiteUrl',
     });
