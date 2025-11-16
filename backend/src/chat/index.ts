@@ -12,10 +12,15 @@ import {
   BedrockRuntimeClient,
   InvokeModelWithResponseStreamCommand,
 } from '@aws-sdk/client-bedrock-runtime';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 // Configuration
 const MODEL_ID = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'; // Claude Sonnet 4.5 inference profile
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+
+// Load system prompt from file
+const SYSTEM_PROMPT = readFileSync(join(__dirname, 'prompts', 'clay-agent-instructions.txt'), 'utf-8');
 
 // Initialize Bedrock Runtime client
 const client = new BedrockRuntimeClient({ region: AWS_REGION });
@@ -46,8 +51,6 @@ export const handler = awslambda.streamifyResponse(
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
       },
     };
 
@@ -74,11 +77,6 @@ export const handler = awslambda.streamifyResponse(
 
       const effectiveSessionId = sessionId || generateSessionId();
 
-      // Build system prompt
-      const systemPrompt = `You are an AI assistant representing Clay Palumbo, an engineering leader and product builder.
-Answer questions about Clay's experience, skills, and approach. Be conversational, helpful, and genuine.
-Keep responses concise but thorough (2-4 paragraphs unless more detail is requested).`;
-
       // Convert messages to Claude format
       const claudeMessages = messages.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -94,7 +92,7 @@ Keep responses concise but thorough (2-4 paragraphs unless more detail is reques
       const requestBody = {
         anthropic_version: 'bedrock-2023-05-31',
         max_tokens: 2048,
-        system: systemPrompt,
+        system: SYSTEM_PROMPT,
         messages: claudeMessages,
         temperature: 0.7,
       };

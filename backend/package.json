@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc && npm run bundle",
+    "build": "tsc && npm run bundle && npm run copy-prompts",
     "bundle": "npm run bundle:chat && npm run bundle:email",
     "bundle:chat": "esbuild src/chat/index.ts --bundle --platform=node --target=node20 --outfile=dist/chat/index.js --external:@aws-sdk/*",
     "bundle:email": "esbuild src/email/index.ts --bundle --platform=node --target=node20 --outfile=dist/email/index.js --external:@aws-sdk/*",
+    "copy-prompts": "mkdir -p dist/chat/prompts && cp src/chat/prompts/*.txt dist/chat/prompts/",
     "watch": "tsc -w",
     "test": "jest",
     "lint": "eslint src/**/*.ts"

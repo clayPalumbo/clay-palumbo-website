@@ -23,15 +23,15 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="relative flex">
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyPress={handleKeyPress}
-        placeholder="Ask me anything about Clay..."
+        placeholder="Ask me anything..."
         disabled={disabled}
         rows={1}
-        className="flex-1 px-5 py-3.5 bg-white/[0.05] border border-white/[0.12] rounded-[16px] text-white text-[15px] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/50 focus:border-transparent resize-none disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+        className="w-full px-5 py-3.5 pr-14 bg-white/[0.05] border border-white/[0.12] rounded-[24px] text-white text-[15px] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/[0.2] focus:border-transparent resize-none disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
         style={{
           minHeight: '52px',
           maxHeight: '200px',
@@ -41,7 +41,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
       <button
         onClick={handleSend}
         disabled={disabled || !input.trim()}
-        className="px-6 py-3.5 bg-[#007AFF] hover:bg-[#0051D5] active:scale-95 rounded-[16px] font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#007AFF] disabled:active:scale-100 shadow-lg shadow-blue-500/25"
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/[0.1] hover:bg-white/[0.15] active:scale-95 rounded-full font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/[0.1] disabled:active:scale-100"
       >
         <svg
           className="w-5 h-5"
