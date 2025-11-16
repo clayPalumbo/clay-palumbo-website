@@ -21,7 +21,7 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
       )}
     >
       {!isUser && (
-        <div className="relative flex-shrink-0">
+        <div className="relative flex-shrink-0 hidden md:block">
           <img
             src={clayHeadshot}
             alt="Clay Palumbo"

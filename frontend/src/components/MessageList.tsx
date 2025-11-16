@@ -25,7 +25,7 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
           message.role === 'assistant';
 
         return (
-          <div className="mb-8" key={message.id}>
+          <div className="mb-4 md:mb-8" key={message.id}>
             <MessageBubble
               message={message}
               isLoading={isLastAssistantMessage}

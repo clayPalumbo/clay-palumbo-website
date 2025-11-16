@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
 import { sendChatMessageStreaming } from '../api/client';
 import type { Message } from '../types';
 import clayHeadshot from '../assets/clay-head-shot.jpeg';
+import type { ChatContainerRef } from '../App';
 
 interface ChatContainerProps {
   initialMessages?: Message[];
@@ -48,197 +49,222 @@ const STARTER_PROMPTS = [
   },
 ];
 
-export default function ChatContainer({ initialMessages = [] }: ChatContainerProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string>();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [userHasScrolled, setUserHasScrolled] = useState(false);
-  const isUserAtBottomRef = useRef(true);
+const ChatContainer = forwardRef<ChatContainerRef, ChatContainerProps>(
+  ({ initialMessages = [] }, ref) => {
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [isLoading, setIsLoading] = useState(false);
+    const [sessionId, setSessionId] = useState<string>();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [userHasScrolled, setUserHasScrolled] = useState(false);
+    const isUserAtBottomRef = useRef(true);
 
-  // Check if user is near bottom of scroll
-  const checkIfAtBottom = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return true;
-
-    const threshold = 100; // pixels from bottom
-    const isAtBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
-
-    isUserAtBottomRef.current = isAtBottom;
-    return isAtBottom;
-  };
-
-  // Handle scroll event
-  const handleScroll = () => {
-    const isAtBottom = checkIfAtBottom();
-    if (!isAtBottom) {
-      setUserHasScrolled(true);
-    }
-  };
-
-  // Scroll to bottom when messages change (only if user hasn't scrolled up)
-  useEffect(() => {
-    if (!userHasScrolled || isUserAtBottomRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, userHasScrolled]);
-
-  // Send initial message if provided
-  useEffect(() => {
-    if (initialMessages.length > 0 && messages.length === initialMessages.length) {
-      const lastMessage = initialMessages[initialMessages.length - 1];
-      if (lastMessage.role === 'user') {
-        handleSendMessage(lastMessage.content);
+    // Expose clearChat method to parent via ref
+    useImperativeHandle(ref, () => ({
+      clearChat: () => {
+        setMessages([]);
+        setSessionId(undefined);
+        setUserHasScrolled(false);
+        isUserAtBottomRef.current = true;
       }
-    }
-  }, []); // Only run once on mount
+    }));
 
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return;
+    // Check if user is near bottom of scroll
+    const checkIfAtBottom = () => {
+      const container = scrollContainerRef.current;
+      if (!container) return true;
 
-    // Reset scroll behavior when user sends a new message
-    setUserHasScrolled(false);
-    isUserAtBottomRef.current = true;
+      const threshold = 100; // pixels from bottom
+      const isAtBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
 
-    // Add user message
-    const userMessage: Message = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      content,
-      timestamp: new Date(),
+      isUserAtBottomRef.current = isAtBottom;
+      return isAtBottom;
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
+    // Handle scroll event - only for chat container
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+      // Ensure we're only handling scroll from the container itself
+      if (event.target !== scrollContainerRef.current) return;
 
-    // Create an assistant message ID that we'll update as chunks arrive
-    const assistantMessageId = crypto.randomUUID();
-    let assistantContent = '';
-
-    // Add empty assistant message that we'll stream into
-    const assistantMessage: Message = {
-      id: assistantMessageId,
-      role: 'assistant',
-      content: '',
-      timestamp: new Date(),
+      const isAtBottom = checkIfAtBottom();
+      if (!isAtBottom) {
+        setUserHasScrolled(true);
+      }
     };
 
-    setMessages((prev) => [...prev, assistantMessage]);
+    // Scroll to bottom when messages change (only if user hasn't scrolled up)
+    useEffect(() => {
+      if (!userHasScrolled || isUserAtBottomRef.current) {
+        messagesEndRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest'
+        });
+      }
+    }, [messages, userHasScrolled]);
 
-    try {
-      // Prepare chat request
-      const chatRequest = {
-        messages: [...messages, userMessage].map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
-        sessionId,
+    // Send initial message if provided
+    useEffect(() => {
+      if (initialMessages.length > 0 && messages.length === initialMessages.length) {
+        const lastMessage = initialMessages[initialMessages.length - 1];
+        if (lastMessage.role === 'user') {
+          handleSendMessage(lastMessage.content);
+        }
+      }
+    }, []); // Only run once on mount
+
+    const handleSendMessage = async (content: string) => {
+      if (!content.trim() || isLoading) return;
+
+      // Reset scroll behavior when user sends a new message
+      setUserHasScrolled(false);
+      isUserAtBottomRef.current = true;
+
+      // Add user message
+      const userMessage: Message = {
+        id: crypto.randomUUID(),
+        role: 'user',
+        content,
+        timestamp: new Date(),
       };
 
-      // Stream response from API
-      await sendChatMessageStreaming(
-        chatRequest,
-        // onChunk callback - called for each piece of content
-        (chunk: string) => {
-          assistantContent += chunk;
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantMessageId
-                ? { ...m, content: assistantContent }
-                : m
-            )
-          );
-        },
-        // onSessionId callback - called when session ID is received
-        (newSessionId: string) => {
-          setSessionId(newSessionId);
-        }
-      );
-    } catch (error) {
-      console.error('Error sending message:', error);
+      setMessages((prev) => [...prev, userMessage]);
+      setIsLoading(true);
 
-      // Replace the empty assistant message with an error message
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantMessageId
-            ? {
-              ...m,
-              content:
-                'Sorry, I encountered an error processing your message. Please try again or contact Clay directly.',
-            }
-            : m
-        )
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      // Create an assistant message ID that we'll update as chunks arrive
+      const assistantMessageId = crypto.randomUUID();
+      let assistantContent = '';
 
-  const isEmpty = messages.length === 0;
+      // Add empty assistant message that we'll stream into
+      const assistantMessage: Message = {
+        id: assistantMessageId,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+      };
 
-  return (
-    <div className="flex flex-col h-[calc(100vh-200px)]">
-      {isEmpty ? (
-        // Empty state: centered input with starters below
-        <div className="flex-1 flex flex-col items-center justify-center px-4 animate-fade-in">
-          <div className="w-full max-w-3xl space-y-4 glass-panel p-5 rounded-2xl">
-            <div className="flex justify-center mb-6">
-              <img
-                src={clayHeadshot}
-                alt="Clay Palumbo"
-                className="w-24 h-24 rounded-full object-cover border-2 border-white/[0.15]"
-              />
-            </div>
-            <h2 className="text-[32px] tracking-tight text-white text-center mb-2">
-              What do you want to know about Clay?
-            </h2>
-            <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+      setMessages((prev) => [...prev, assistantMessage]);
 
-            {/* Conversation starters */}
-            <div className="flex flex-col pt-2">
-              {STARTER_PROMPTS.map((starter, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSendMessage(starter.prompt)}
-                  disabled={isLoading}
-                  className={`group px-4 py-3 mb-1 rounded-2xl hover:bg-white/[0.06] transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 animate-slide-up ${index !== STARTER_PROMPTS.length - 1 ? 'border-b border-white/[0.08]' : ''
-                    }`}
-                  style={{ animationDelay: `${index * 0.2}s` }}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-gray-400 group-hover:text-gray-300 transition-colors">{starter.icon}</span>
-                    <span className="text-[13px] font-normal text-gray-400 group-hover:text-gray-300 transition-colors text-left leading-snug">
-                      {starter.text}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        // Chat mode: messages + input at bottom
-        <>
-          <div
-            ref={scrollContainerRef}
-            onScroll={handleScroll}
-            className="flex-1 overflow-y-auto px-4 py-8 space-y-6 glass-panel rounded-2xl m-4"
-          >
-            <div className="max-w-3xl mx-auto">
-              <MessageList messages={messages} isLoading={isLoading} />
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
+      try {
+        // Prepare chat request
+        const chatRequest = {
+          messages: [...messages, userMessage].map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
+          sessionId,
+        };
 
-          <div className="border-t border-white/[0.08] px-4 py-4">
-            <div className="max-w-3xl mx-auto">
+        // Stream response from API
+        await sendChatMessageStreaming(
+          chatRequest,
+          // onChunk callback - called for each piece of content
+          (chunk: string) => {
+            assistantContent += chunk;
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantMessageId
+                  ? { ...m, content: assistantContent }
+                  : m
+              )
+            );
+          },
+          // onSessionId callback - called when session ID is received
+          (newSessionId: string) => {
+            setSessionId(newSessionId);
+          }
+        );
+      } catch (error) {
+        console.error('Error sending message:', error);
+
+        // Replace the empty assistant message with an error message
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMessageId
+              ? {
+                ...m,
+                content:
+                  'Sorry, I encountered an error processing your message. Please try again or contact Clay directly.',
+              }
+              : m
+          )
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const isEmpty = messages.length === 0;
+
+    return (
+      <div className="flex flex-col h-[calc(100vh-120px)] md:h-[calc(100vh-200px)]">
+          {isEmpty ? (
+          // Empty state: centered input with starters below
+          <div className="flex-1 flex flex-col items-center justify-center px-2 md:px-4 animate-fade-in">
+            <div className="w-full max-w-3xl space-y-4 glass-panel p-4 md:p-5 rounded-2xl">
+              <div className="flex justify-center mb-6">
+                <img
+                  src={clayHeadshot}
+                  alt="Clay Palumbo"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-white/[0.15]"
+                />
+              </div>
+              <h2 className="text-[24px] md:text-[32px] tracking-tight text-white text-center mb-2 px-4">
+                What do you want to know about Clay?
+              </h2>
+              <p className="text-[13px] md:text-[14px] text-gray-400 text-center mb-4 px-4 font-light">
+                An interactive, AI-powered version of my resume.
+              </p>
               <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+
+              {/* Conversation starters */}
+              <div className="flex flex-col pt-2">
+                {STARTER_PROMPTS.map((starter, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSendMessage(starter.prompt)}
+                    disabled={isLoading}
+                    className={`group px-4 py-3 mb-1 rounded-2xl hover:bg-white/[0.06] transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 animate-slide-up ${index !== STARTER_PROMPTS.length - 1 ? 'border-b border-white/[0.08]' : ''
+                      }`}
+                    style={{ animationDelay: `${index * 0.2}s` }}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-gray-400 group-hover:text-gray-300 transition-colors">{starter.icon}</span>
+                      <span className="text-[13px] font-normal text-gray-400 group-hover:text-gray-300 transition-colors text-left leading-snug">
+                        {starter.text}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </>
-      )}
-    </div>
-  );
-}
+        ) : (
+          // Chat mode: messages + input at bottom
+          <>
+            <div
+              ref={scrollContainerRef}
+              onScroll={handleScroll}
+              className="flex-1 overflow-y-auto px-2 md:px-4 py-4 md:py-8 glass-panel md:rounded-2xl md:m-4 hide-scrollbar"
+            >
+              <div className="max-w-3xl mx-auto">
+                <MessageList messages={messages} isLoading={isLoading} />
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
+
+            <div className="border-t border-white/[0.08] px-2 md:px-4 py-3 md:py-4">
+              <div className="max-w-3xl mx-auto">
+                <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
+});
+
+ChatContainer.displayName = 'ChatContainer';
+
+export default ChatContainer;
