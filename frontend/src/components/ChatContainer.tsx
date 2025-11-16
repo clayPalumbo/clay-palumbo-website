@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
-import { sendChatMessage } from '../api/client';
+import { sendChatMessageStreaming } from '../api/client';
 import type { Message } from '../types';
 
 interface ChatContainerProps {
@@ -66,6 +66,20 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
+    // Create an assistant message ID that we'll update as chunks arrive
+    const assistantMessageId = crypto.randomUUID();
+    let assistantContent = '';
+
+    // Add empty assistant message that we'll stream into
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, assistantMessage]);
+
     try {
       // Prepare chat request
       const chatRequest = {
@@ -76,36 +90,40 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
         sessionId,
       };
 
-      // Send to API
-      const response = await sendChatMessage(chatRequest);
-
-      // Update session ID
-      if (response.sessionId) {
-        setSessionId(response.sessionId);
-      }
-
-      // Add assistant message
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: response.response,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
+      // Stream response from API
+      await sendChatMessageStreaming(
+        chatRequest,
+        // onChunk callback - called for each piece of content
+        (chunk: string) => {
+          assistantContent += chunk;
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMessageId
+                ? { ...m, content: assistantContent }
+                : m
+            )
+          );
+        },
+        // onSessionId callback - called when session ID is received
+        (newSessionId: string) => {
+          setSessionId(newSessionId);
+        }
+      );
     } catch (error) {
       console.error('Error sending message:', error);
 
-      // Add error message
-      const errorMessage: Message = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content:
-          'Sorry, I encountered an error processing your message. Please try again or contact Clay directly.',
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, errorMessage]);
+      // Replace the empty assistant message with an error message
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMessageId
+            ? {
+                ...m,
+                content:
+                  'Sorry, I encountered an error processing your message. Please try again or contact Clay directly.',
+              }
+            : m
+        )
+      );
     } finally {
       setIsLoading(false);
     }

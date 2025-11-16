@@ -99,8 +99,9 @@ export class PortfolioStack extends cdk.Stack {
       authType: lambda.FunctionUrlAuthType.NONE,
       cors: {
         allowedOrigins: allowedOrigins,
-        allowedMethods: [lambda.HttpMethod.POST],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        allowedMethods: [lambda.HttpMethod.ALL], // Allow all methods including OPTIONS
+        allowedHeaders: ['*'], // Allow all headers for SSE streaming
+        exposeHeaders: ['*'], // Expose all headers for SSE streaming
         maxAge: cdk.Duration.hours(1),
       },
       invokeMode: lambda.InvokeMode.RESPONSE_STREAM, // Enable streaming!
