@@ -14,7 +14,7 @@ function App() {
       </main>
 
       <footer className=" text-center py-8 text-gray-500 text-sm font-light">
-        <p>© {new Date().getFullYear()} Clay Palumbo. Built with Strands + AWS AgentCore.</p>
+        <p>© {new Date().getFullYear()} Clay Palumbo</p>
       </footer>
     </div>
   );

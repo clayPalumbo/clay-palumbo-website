@@ -53,11 +53,37 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [userHasScrolled, setUserHasScrolled] = useState(false);
+  const isUserAtBottomRef = useRef(true);
 
-  // Scroll to bottom when messages change
+  // Check if user is near bottom of scroll
+  const checkIfAtBottom = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return true;
+
+    const threshold = 100; // pixels from bottom
+    const isAtBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+
+    isUserAtBottomRef.current = isAtBottom;
+    return isAtBottom;
+  };
+
+  // Handle scroll event
+  const handleScroll = () => {
+    const isAtBottom = checkIfAtBottom();
+    if (!isAtBottom) {
+      setUserHasScrolled(true);
+    }
+  };
+
+  // Scroll to bottom when messages change (only if user hasn't scrolled up)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (!userHasScrolled || isUserAtBottomRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, userHasScrolled]);
 
   // Send initial message if provided
   useEffect(() => {
@@ -71,6 +97,10 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim() || isLoading) return;
+
+    // Reset scroll behavior when user sends a new message
+    setUserHasScrolled(false);
+    isUserAtBottomRef.current = true;
 
     // Add user message
     const userMessage: Message = {
@@ -191,7 +221,11 @@ export default function ChatContainer({ initialMessages = [] }: ChatContainerPro
       ) : (
         // Chat mode: messages + input at bottom
         <>
-          <div className="flex-1 overflow-y-auto px-4 py-8 space-y-6 glass-panel rounded-2xl m-4">
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto px-4 py-8 space-y-6 glass-panel rounded-2xl m-4"
+          >
             <div className="max-w-3xl mx-auto">
               <MessageList messages={messages} isLoading={isLoading} />
               <div ref={messagesEndRef} />

@@ -53,9 +53,9 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
                   borderBottomColor: 'rgb(147, 51, 234, 0.3)'
                 }}
               />
-              {/* Slow spinning inner accent */}
+              {/* Fast spinning inner accent */}
               <div
-                className="absolute -inset-0.5 rounded-full border border-transparent border-t-pink-400"
+                className="absolute -inset-0.5 rounded-full border border-transparent border-t-cyan-400"
                 style={{
                   animation: 'spin-fast 0.8s linear infinite',
                   borderTopWidth: '1px'

@@ -16,6 +16,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 // Configuration
+// const MODEL_ID = 'anthropic.claude-haiku-4-5-20251001-v1:0'; 
 const MODEL_ID = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'; // Claude Sonnet 4.5 inference profile
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
 
@@ -88,7 +89,7 @@ export const handler = awslambda.streamifyResponse(
         ],
       }));
 
-      // Prepare request for Claude via Bedrock
+      // Prepare request body for Claude
       const requestBody = {
         anthropic_version: 'bedrock-2023-05-31',
         max_tokens: 2048,
@@ -116,7 +117,7 @@ export const handler = awslambda.streamifyResponse(
           if (event.chunk?.bytes) {
             const chunk = JSON.parse(new TextDecoder().decode(event.chunk.bytes));
 
-            // Handle different event types from Claude
+            // Handle Claude response format
             if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
               responseStream.write(`data: ${JSON.stringify({ type: 'content', text: chunk.delta.text })}\n\n`);
             } else if (chunk.type === 'message_stop') {
