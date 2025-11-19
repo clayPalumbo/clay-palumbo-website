@@ -93,6 +93,16 @@ const ChatContainer = forwardRef<ChatContainerRef, ChatContainerProps>(
       }
     };
 
+    // Scroll to top when first message is sent (transition from empty to chat)
+    useEffect(() => {
+      if (messages.length === 2) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    }, [messages.length]);
+
     // Scroll to bottom when messages change (only if user hasn't scrolled up)
     useEffect(() => {
       if (!userHasScrolled || isUserAtBottomRef.current) {
@@ -198,8 +208,8 @@ const ChatContainer = forwardRef<ChatContainerRef, ChatContainerProps>(
     const isEmpty = messages.length === 0;
 
     return (
-      <div className="flex flex-col h-[calc(100vh-120px)] md:h-[calc(100vh-200px)]">
-          {isEmpty ? (
+      <div className="flex flex-col h-[calc(100vh-80px)] md:h-[calc(100vh-200px)]">
+        {isEmpty ? (
           // Empty state: centered input with starters below
           <div className="flex-1 flex flex-col items-center justify-center px-2 md:px-4 animate-fade-in">
             <div className="w-full max-w-3xl space-y-4 glass-panel p-4 md:p-5 rounded-2xl">
@@ -263,7 +273,7 @@ const ChatContainer = forwardRef<ChatContainerRef, ChatContainerProps>(
         )}
       </div>
     );
-});
+  });
 
 ChatContainer.displayName = 'ChatContainer';
 

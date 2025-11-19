@@ -28,7 +28,7 @@ export default function About() {
             </p>
 
             <p className="text-[15px] md:text-[16px] leading-relaxed text-gray-300 max-w-[65ch]">
-              My background spans frontend and backend engineering, data systems, and cloud architecture (AWS certified). I care about reliable, maintainable software that actually ships—whether I'm defining a roadmap, mentoring engineers, or writing the critical lines of code myself. My goal is always the same: turn complex problems into scalable, AI-driven products that deliver clear business value.
+              My background spans frontend and backend engineering, data systems, and cloud architecture (AWS certified). I care about reliable, maintainable software that actually ships - whether I'm defining a roadmap, mentoring engineers, or writing the critical lines of code myself. My goal is always the same: turn complex problems into scalable, AI-driven products that deliver clear business value.
             </p>
 
             <p className="text-[15px] md:text-[16px] leading-relaxed text-gray-300 max-w-[65ch]">

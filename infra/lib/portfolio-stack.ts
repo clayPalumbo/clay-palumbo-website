@@ -57,7 +57,7 @@ export class PortfolioStack extends cdk.Stack {
       logRetention: logs.RetentionDays.ONE_WEEK,
     });
 
-    // Grant Bedrock permissions to Chat Lambda
+    // Grant Bedrock permissions to Chat Lambda (models + knowledge base)
     chatLambda.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
@@ -65,8 +65,10 @@ export class PortfolioStack extends cdk.Stack {
           'bedrock:InvokeAgent',
           'bedrock:InvokeModel',
           'bedrock:InvokeModelWithResponseStream',
+          'bedrock:Retrieve', // Knowledge Base retrieval
+          'bedrock:RetrieveAndGenerate', // Alternative retrieval method
         ],
-        resources: ['*'], // In production, scope this to specific agent/model ARNs
+        resources: ['*'], // Covers all models and knowledge bases
       })
     );
 

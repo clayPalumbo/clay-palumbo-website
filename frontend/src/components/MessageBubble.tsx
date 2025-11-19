@@ -69,7 +69,7 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
         className={clsx(
           'px-5 ',
           isUser
-            ? 'py-3.5 max-w-[75%] bg-[#007AFF] text-white shadow-lg shadow-blue-500/20 rounded-tl-[18px] rounded-bl-[18px] rounded-br-[18px]'
+            ? 'py-2.5 max-w-[75%] bg-[#007AFF] text-white shadow-lg shadow-blue-500/20 rounded-tl-[18px] rounded-bl-[18px] rounded-br-[18px]'
             : 'flex-1 text-white rounded-[18px]'
         )}
       >
@@ -112,7 +112,7 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
 
         <div
           className={clsx(
-            'text-[11px] mt-2 font-light',
+            'text-[11px] font-light',
             isUser ? 'text-white/60' : 'text-gray-500'
           )}
         >
