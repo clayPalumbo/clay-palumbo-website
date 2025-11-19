@@ -78,36 +78,50 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
             {message.content}
           </p>
         ) : (
-          <div className="prose prose-invert prose-sm max-w-none [&>p]:text-[15px] [&>p]:leading-relaxed [&>p]:font-normal [&>p]:text-gray-200 [&>ul]:text-[15px] [&>ol]:text-[15px] [&>li]:text-gray-200 [&>h1]:text-xl [&>h1]:font-semibold [&>h1]:mb-2 [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:mb-2 [&>h3]:text-base [&>h3]:font-semibold [&>h3]:mb-1 [&>a]:text-blue-400 [&>a]:underline hover:[&>a]:text-blue-300 [&>code]:bg-white/[0.1] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-sm [&>code]:text-gray-200">
-            <ReactMarkdown
-              components={{
-                code({ node, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || '');
-                  const inline = (props as any).inline;
-                  return !inline && match ? (
-                    <SyntaxHighlighter
-                      style={vscDarkPlus as any}
-                      language={match[1]}
-                      PreTag="div"
-                      customStyle={{
-                        margin: '0.5rem 0',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                      }}
-                    >
-                      {String(children).replace(/\n$/, '')}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  );
-                },
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-          </div>
+          <>
+            {/* Show thinking animation when loading with no content - mobile only */}
+            {isLoading && !message.content ? (
+              <div className="flex md:hidden items-center gap-2 py-3">
+                <div className="flex gap-1.5">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-thinking-dot" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-thinking-dot" style={{ animationDelay: '200ms' }}></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-thinking-dot" style={{ animationDelay: '400ms' }}></div>
+                </div>
+                <span className="text-gray-400 text-sm font-light"></span>
+              </div>
+            ) : (
+              <div className="prose prose-invert prose-sm max-w-none [&>p]:text-[15px] [&>p]:leading-relaxed [&>p]:font-normal [&>p]:text-gray-200 [&>ul]:text-[15px] [&>ol]:text-[15px] [&>li]:text-gray-200 [&>h1]:text-xl [&>h1]:font-semibold [&>h1]:mb-2 [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:mb-2 [&>h3]:text-base [&>h3]:font-semibold [&>h3]:mb-1 [&>a]:text-blue-400 [&>a]:underline hover:[&>a]:text-blue-300 [&>code]:bg-white/[0.1] [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-sm [&>code]:text-gray-200">
+                <ReactMarkdown
+                  components={{
+                    code({ node, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      const inline = (props as any).inline;
+                      return !inline && match ? (
+                        <SyntaxHighlighter
+                          style={vscDarkPlus as any}
+                          language={match[1]}
+                          PreTag="div"
+                          customStyle={{
+                            margin: '0.5rem 0',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                          }}
+                        >
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              </div>
+            )}
+          </>
         )}
 
         <div

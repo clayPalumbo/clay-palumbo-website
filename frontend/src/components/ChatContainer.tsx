@@ -208,10 +208,10 @@ const ChatContainer = forwardRef<ChatContainerRef, ChatContainerProps>(
     const isEmpty = messages.length === 0;
 
     return (
-      <div className="flex flex-col h-[calc(100vh-80px)] md:h-[calc(100vh-200px)]">
+      <div className="flex flex-col min-h-[calc(100vh-80px)] md:h-[calc(100vh-200px)]">
         {isEmpty ? (
           // Empty state: centered input with starters below
-          <div className="flex-1 flex flex-col items-center justify-center px-2 md:px-4 animate-fade-in">
+          <div className="flex-1 flex flex-col items-center justify-center px-2 md:px-4 pb-safe animate-fade-in">
             <div className="w-full max-w-3xl space-y-4 glass-panel p-4 md:p-5 rounded-2xl">
               <div className="flex justify-center mb-6">
                 <img
@@ -264,8 +264,8 @@ const ChatContainer = forwardRef<ChatContainerRef, ChatContainerProps>(
               </div>
             </div>
 
-            <div className="border-t border-white/[0.08] px-2 md:px-4 py-3 md:py-4">
-              <div className="max-w-3xl mx-auto">
+            <div className="border-t border-white/[0.08] px-2 md:px-4 py-3 md:py-4 bg-black/50 backdrop-blur-sm">
+              <div className="max-w-3xl mx-auto pb-safe">
                 <ChatInput onSend={handleSendMessage} disabled={isLoading} />
               </div>
             </div>

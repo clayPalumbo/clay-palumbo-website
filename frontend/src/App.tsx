@@ -20,7 +20,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-white overflow-x-hidden">
       <PointCloudBackground />
 
       <Sidenav onClearChat={handleClearChat} />

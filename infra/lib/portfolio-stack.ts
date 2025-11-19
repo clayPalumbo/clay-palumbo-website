@@ -11,6 +11,10 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
+import * as cloudwatchActions from 'aws-cdk-lib/aws-cloudwatch-actions';
+import * as sns from 'aws-cdk-lib/aws-sns';
+import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
 import * as path from 'path';
 
@@ -49,6 +53,8 @@ export class PortfolioStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../backend/dist/chat')),
       timeout: cdk.Duration.seconds(300),
       memorySize: 512,
+      // Note: No hard concurrency limit due to account limits
+      // Cost protection provided by CloudWatch billing alarm at $40
       environment: {
         AGENT_RUNTIME_URL: 'http://agent-runtime:8080', // Update this based on AgentCore setup
         NODE_ENV: 'production',
@@ -79,6 +85,7 @@ export class PortfolioStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../backend/dist/email')),
       timeout: cdk.Duration.seconds(30),
       memorySize: 256,
+      // No concurrency limit - email is rarely used and cheap
       environment: {
         NODE_ENV: 'production',
       },
@@ -125,6 +132,7 @@ export class PortfolioStack extends cdk.Stack {
     });
 
     // Chat streaming endpoint
+    // Note: Cost protection via CloudWatch billing alarm, not hard throttling
     httpApi.addRoutes({
       path: '/api/chat/stream',
       methods: [apigateway.HttpMethod.POST],
@@ -234,6 +242,51 @@ export class PortfolioStack extends cdk.Stack {
     }
 
     // =====================================================
+    // Cost Monitoring & Alarms
+    // =====================================================
+
+    // SNS Topic for billing alerts (email subscription must be added manually)
+    const billingAlertTopic = new sns.Topic(this, 'BillingAlertTopic', {
+      displayName: 'Clay Palumbo Portfolio - Billing Alerts',
+      topicName: 'claypalumbo-portfolio-billing-alerts',
+    });
+
+    // CloudWatch Alarm for estimated charges (triggers at $40 = 80% of $50 budget)
+    const billingAlarm = new cloudwatch.Alarm(this, 'BillingAlarm', {
+      alarmName: 'ClayPalumboPortfolio-BillingAlert-40USD',
+      alarmDescription: 'Alert when estimated AWS charges exceed $40',
+      metric: new cloudwatch.Metric({
+        namespace: 'AWS/Billing',
+        metricName: 'EstimatedCharges',
+        dimensionsMap: {
+          Currency: 'USD',
+        },
+        statistic: 'Maximum',
+        period: cdk.Duration.hours(6),
+      }),
+      threshold: 40, // Alert at $40 (80% of $50 budget)
+      evaluationPeriods: 1,
+      comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+    });
+
+    billingAlarm.addAlarmAction(new cloudwatchActions.SnsAction(billingAlertTopic));
+
+    // Lambda throttle alarms
+    const chatThrottleAlarm = new cloudwatch.Alarm(this, 'ChatLambdaThrottleAlarm', {
+      alarmName: 'ClayPalumboPortfolio-ChatLambdaThrottles',
+      alarmDescription: 'Alert when chat Lambda is being throttled due to concurrency limits',
+      metric: chatLambda.metricThrottles({
+        period: cdk.Duration.minutes(5),
+        statistic: 'Sum',
+      }),
+      threshold: 10, // Alert if more than 10 throttles in 5 minutes
+      evaluationPeriods: 1,
+      comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+    });
+
+    chatThrottleAlarm.addAlarmAction(new cloudwatchActions.SnsAction(billingAlertTopic));
+
+    // =====================================================
     // Outputs
     // =====================================================
     new cdk.CfnOutput(this, 'ApiUrl', {
@@ -270,6 +323,12 @@ export class PortfolioStack extends cdk.Stack {
       value: domainName ? `https://${domainName}` : `https://${distribution.distributionDomainName}`,
       description: 'Website URL',
       exportName: 'ClayPalumboWebsiteUrl',
+    });
+
+    new cdk.CfnOutput(this, 'BillingAlertTopicArn', {
+      value: billingAlertTopic.topicArn,
+      description: 'SNS Topic ARN for billing alerts (subscribe your email)',
+      exportName: 'ClayPalumboBillingAlertTopic',
     });
   }
 }

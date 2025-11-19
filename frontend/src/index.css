@@ -21,6 +21,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -28,10 +30,13 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 #root {
   width: 100%;
+  overflow-x: hidden;
 }
 
 /* Apple-style scrollbar - minimal and refined */
@@ -140,6 +145,11 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Mobile safe area support */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Dynamic spinner animations */
 @keyframes spin-fast {
   from {
@@ -179,4 +189,19 @@ body {
 
 .animate-bounce-gentle {
   animation: bounce-gentle 2s ease-in-out infinite;
+}
+
+@keyframes thinking-dot {
+  0%, 60%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-6px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+.animate-thinking-dot {
+  animation: thinking-dot 1.4s ease-in-out infinite;
 }
