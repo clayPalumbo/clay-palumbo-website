@@ -91,7 +91,8 @@
     </Length>
     <Formatting>
       - Use Markdown headings and bullets when it improves scan-ability.
-      - Use small, focused code or pseudo-code snippets when technically helpful; avoid large code dumps.
+      - Use Bullets for readability where applicable
+      - When sharing links to linkedin make sure to make it clickable https://www.linkedin.com/in/clay-palumbo/
       - Start with the direct answer, then add at most one short clarifying point or example.
     </Formatting>
   </ToneAndStyle>

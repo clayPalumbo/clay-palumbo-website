@@ -4,67 +4,93 @@
 
 Senior Software Engineer / Technical Lead focused on full-stack, distributed systems, generative AI, and cloud architecture.
 
+---
+
 ## One-Paragraph Summary
 
-Clay is a hands-on engineering leader at Slalom Build in Charlotte, NC, with deep experience taking products from concept to production. He sits at the intersection of software architecture, full-stack engineering, and client-facing consulting, with a focus on generative AI platforms, scalable cloud-native systems, and data-driven applications. He is trusted by senior stakeholders to translate vision into execution through clear architecture, strong delivery practices, and empowered teams. :contentReference[oaicite:0]{index=0}
+Clay Palumbo is a hands-on engineering leader at Slalom Build in Charlotte, NC, with deep experience taking products from concept to production. He sits at the intersection of software architecture, full-stack engineering, and client-facing consulting, with a focus on generative AI platforms, scalable cloud-native systems, and data-driven applications. Clay is trusted by senior stakeholders to translate vision into execution through clear architecture, strong delivery practices, and empowered teams.
+
+---
 
 ## Current Role
 
-- Company: Slalom Build
-- Title: Architect, Software Engineering (Senior Software Engineer / Technical Lead)
-- Location: Charlotte, NC
-- Dates: November 2020 – Present
-- Focus Areas:
-  - Generative AI platforms and multi-agent systems
-  - Advanced retrieval-augmented generation (RAG) and vector search
-  - Full-stack product development (frontend, backend, and data)
-  - Cloud architecture and infrastructure on AWS and Azure
-  - CI/CD, DevOps, and environment automation
-- Typical Responsibilities:
-  - Design end-to-end architectures for enterprise applications and AI-heavy systems
-  - Lead cross-functional teams (engineers, designers, data engineers) from discovery to production
-  - Write and review code across frontend, backend, and data layers
-  - Define roadmaps and break work into milestones, epics, and stories
-  - Collaborate with VP/CTO-level stakeholders through demos, roadmap shaping, and technical guidance :contentReference[oaicite:1]{index=1}
+- Company: Slalom Build  
+- Title: Architect, Software Engineering (Senior Software Engineer / Technical Lead)  
+- Location: Charlotte, NC  
+- Dates: November 2020 – Present  
+
+Clay’s current role at Slalom Build includes:
+
+- Focusing on generative AI platforms and multi-agent systems for enterprise clients.
+- Designing and implementing advanced retrieval-augmented generation (RAG) and vector search solutions.
+- Leading full-stack product development across frontend, backend, and data layers.
+- Owning cloud architecture and infrastructure, primarily on AWS and Azure.
+- Driving CI/CD, DevOps practices, and environment automation.
+
+Typical responsibilities in this role:
+
+- Designing end-to-end architectures for enterprise applications and AI-heavy systems.
+- Leading cross-functional teams (engineers, designers, data engineers) from discovery through production.
+- Writing and reviewing code across frontend, backend, and data layers.
+- Defining roadmaps and breaking work into milestones, epics, and user stories.
+- Collaborating with VP- and CTO-level stakeholders through demos, roadmap shaping, and technical guidance.
+
+---
 
 ## Career Snapshot (Timeline)
 
-- 2020 – Present: Architect, Software Engineering – Slalom Build (Charlotte, NC)
-- 2020 (May – Nov): Application Developer – Empowered Benefits (an Aflac Company)
-- 2019 – 2020: Frontend Developer – Union
-- 2019 (Feb – Nov): Application Systems Engineer – Wells Fargo (Cyber Security Innovations)
-- 2018 – 2019: Software Developer – The IMAGINE Group :contentReference[oaicite:2]{index=2}
+Clay’s career timeline:
+
+- 2020 – Present: Architect, Software Engineering – Slalom Build (Charlotte, NC).
+- May 2020 – November 2020: Application Developer – Empowered Benefits (an Aflac Company).
+- 2019 – 2020: Frontend Developer – Union.
+- February 2019 – November 2019: Application Systems Engineer – Wells Fargo (Cyber Security Innovations).
+- 2018 – 2019: Software Developer – The IMAGINE Group.
+
+---
 
 ## Education
 
-**Bachelor of Science – Computer Science**  
-Appalachian State University  
-Graduated: 2018
+Degree: Bachelor of Science in Computer Science  
+Institution: Appalachian State University  
+Graduation Year: 2018
+
+---
 
 ## Core Themes
 
-- Generative AI architecture and orchestration
-- Multi-agent systems and advanced RAG pipelines
-- Full-stack engineering (TypeScript/JavaScript, Python, Java)
-- Cloud-native design on AWS and Azure
-- Microservices, serverless, and event-driven architectures
-- Data pipelines, search, and retrieval systems
-- CI/CD, DevOps, and automated environment provisioning
-- Technical leadership, mentorship, and cross-functional collaboration :contentReference[oaicite:3]{index=3}
+Across roles and projects, Clay’s work centers on:
+
+- Generative AI architecture and orchestration for enterprise use cases.
+- Multi-agent systems and advanced RAG pipelines that combine search, tools, and reasoning.
+- Full-stack engineering using TypeScript, JavaScript, Python, and Java.
+- Cloud-native design on AWS and Azure, including microservices and serverless patterns.
+- Distributed, event-driven architectures and streaming workflows.
+- Data pipelines, search, and retrieval systems built on relational databases and search engines.
+- CI/CD, DevOps, and automated environment provisioning.
+- Technical leadership, mentorship, and cross-functional collaboration with product, design, and data teams.
+
+---
 
 ## Technical Strengths (High-Level)
 
-- Languages: TypeScript, JavaScript, Python, Java, SQL
-- Frameworks: Angular, React, Node.js, NestJS, FastAPI
-- Cloud & Infra: AWS (Certified Solutions Architect – Associate), Azure, Docker, ECS Fargate, serverless patterns, Streaming
-- Data & Search: Postgres, other RDBMS, ElasticSearch / vector-like search, data pipelines
-- GenAI: RAG, vector search, multi-agent orchestration, Bedrock/OpenAI-style LLM integration
-- DevOps: GitHub Actions, Bitbucket pipelines, Terraform/CDK, automated CI/CD :contentReference[oaicite:4]{index=4}
+Clay’s primary technical strengths include:
+
+- Languages: TypeScript, JavaScript, Python, Java, SQL.
+- Frameworks: Angular, React, Node.js, NestJS, FastAPI.
+- Cloud and Infrastructure: AWS (Certified Solutions Architect – Associate), Azure, Docker, ECS Fargate, serverless patterns, real-time and streaming architectures.
+- Data and Search: Postgres and other RDBMS, ElasticSearch, vector-like search, and data pipelines.
+- GenAI: Retrieval-augmented generation (RAG), vector search, multi-agent orchestration, and Bedrock/OpenAI-style LLM integration.
+- DevOps: GitHub Actions, Bitbucket Pipelines, Terraform, AWS CDK, and automated CI/CD practices.
+
+---
 
 ## Ways Clay Typically Adds Value
 
-- Turn vague “we want AI” ideas into concrete, production-grade systems
-- Design architectures that balance speed, reliability, and long-term maintainability
-- Lead and mentor engineers while still writing critical paths of code
-- Improve developer velocity and quality through better patterns, tooling, and pipelines
-- Build trust with leadership via clear communication and consistent delivery
+Clay typically adds value to teams and organizations by:
+
+- Turning vague “we want AI” ideas into concrete, production-grade systems with clear architectures and delivery plans.
+- Designing architectures that balance speed of delivery, reliability, and long-term maintainability.
+- Leading and mentoring engineers while still writing code on critical paths and core services.
+- Improving developer velocity and quality through better patterns, internal frameworks, tooling, and pipelines.
+- Building trust with leadership via clear communication, realistic trade-off discussions, and consistent delivery of working software.

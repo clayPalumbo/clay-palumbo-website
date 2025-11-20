@@ -261,12 +261,6 @@ This document captures Clay Palumbo’s technology stack, language proficiency, 
 
 ## Other Tools & Platforms
 
-### WordPress
-- Proficiency: Advanced
-- Usage:
-  - Building and customizing content-driven sites.
-  - Integrating with broader digital experiences when needed.
-
 ### Design & Collaboration
 - Figma, design systems, and working closely with UX/UI teams.
 - Jira, Confluence, and other agile tooling for backlog and documentation.

@@ -16,7 +16,7 @@ Built a personal AI-powered resume site over a weekend using AWS and modern fron
   - Fronted by **CloudFront** as a CDN for global performance.
   - Custom domain registered and managed via **Route 53**.
 - Development:
-  - Leveraged **Cloud Code** and multiple **MCP servers** (e.g., Connect 7) to rapidly scaffold components, iterate on UX, and wire up API integrations.
+  - Leveraged **Claude Code** and multiple **MCP servers** (e.g., Context7) to rapidly scaffold components, iterate on UX, and wire up API integrations.
 
 ### Backend & AI
 

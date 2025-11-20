@@ -15,7 +15,7 @@
     <high_level_rules>
       <allowed_definition>
         A message is ALLOWED if it is reasonably safe AND at least one of the following is true:
-        - It relates to Clay Palumbo's professional background, experience, skills, or projects.
+        - It relates to Clay Palumbo's professional background, experience, skills, education, or projects.
         - It asks about software engineering, consulting, or technology topics that are within Clay's professional domain.
         - It is a general greeting or polite conversation starter (e.g., "Hi", "How are you?", "Nice to meet you").
       </allowed_definition>
@@ -27,7 +27,7 @@
         - It is completely off-topic and unrelated to Clay Palumbo or his professional domain
           (for example: cooking tips, relationship therapy, gambling strategies, etc.).
         - It contains offensive, abusive, or inappropriate language (hate speech, slurs, harassment).
-        - It asks for deeply personal or sensitive information about Clay that is outside a professional context
+        - It asks for deeply personal or sensitive information about Clay that is outside a professional or educational context
           (e.g., sexual life, medical details, political affiliation, religious beliefs, home address, finances).
       </not_allowed_definition>
     </high_level_rules>
